@@ -144,7 +144,7 @@ erDiagram
   MACHINES {
     UUID machine_id PK
     VARCHAR machine_code
-    VARCHAR site_id Optional
+    VARCHAR site_id 
     VARCHAR asset_type
     VARCHAR model
     VARCHAR serial_number
@@ -192,7 +192,7 @@ erDiagram
     UUID record_id PK
     UUID machine_id FK
     VARCHAR source_system
-    VARCHAR source_work_order_id Optional
+    VARCHAR source_work_order_id 
     TIMESTAMP start_date
     TIMESTAMP end_date
     BOOLEAN ongoing
