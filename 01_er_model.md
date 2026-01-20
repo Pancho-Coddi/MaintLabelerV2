@@ -123,23 +123,121 @@ Este ER modela mantenciones como un **data product**: trazable, auditado y listo
 ## Mermaid (referencia visual dentro del repo)
 ```mermaid
 erDiagram
-  MACHINES ||--o{ MACHINE_SYSTEMS : "1:N"
-  SYSTEMS  ||--o{ MACHINE_SYSTEMS : "1:N"
+  MACHINES ||--o{ MACHINE_SYSTEMS : has
+  SYSTEMS  ||--o{ MACHINE_SYSTEMS : installed_on
 
-  SYSTEMS  ||--o{ SUBSYSTEMS : "1:N"
-  SUBSYSTEMS ||--o{ COMPONENTS : "1:N"
+  SYSTEMS ||--o{ SUBSYSTEMS : contains
+  SUBSYSTEMS ||--o{ COMPONENTS : composed_of
 
-  MACHINES ||--o{ RECORDS : "1:N"
-  RECORDS  ||--o{ JOBS : "1:N"
-  JOBS     ||--o{ ACTIONS : "1:N"
+  MACHINES ||--o{ RECORDS : has
+  RECORDS  ||--o{ JOBS : includes
+  JOBS     ||--o{ ACTIONS : executes
 
-  ACTION_TYPES ||--o{ ACTIONS : "1:N"
+  ACTION_TYPES ||--o{ ACTIONS : typed_as
 
-  SYSTEMS ||--o{ JOBS : "scope (optional)"
-  SUBSYSTEMS ||--o{ JOBS : "scope (optional)"
+  SYSTEMS ||--o{ JOBS : scope_system
+  SUBSYSTEMS ||--o{ JOBS : scope_subsystem
 
-  SUBSYSTEMS ||--o{ ACTIONS : "target (required)"
-  COMPONENTS ||--o{ ACTIONS : "target (optional)"
+  SUBSYSTEMS ||--o{ ACTIONS : applied_to_subsystem
+  COMPONENTS ||--o{ ACTIONS : applied_to_component
+
+  MACHINES {
+    UUID machine_id PK
+    VARCHAR machine_code
+    VARCHAR site_id
+    VARCHAR asset_type
+    VARCHAR model
+    VARCHAR serial_number
+    TEXT description
+    TIMESTAMP created_at
+    TIMESTAMP updated_at
+  }
+
+  SYSTEMS {
+    UUID system_id PK
+    VARCHAR system_name
+    BOOLEAN active
+    TIMESTAMP created_at
+    TIMESTAMP updated_at
+  }
+
+  SUBSYSTEMS {
+    UUID subsystem_id PK
+    UUID system_id FK
+    VARCHAR subsystem_name
+    BOOLEAN is_repairable
+    BOOLEAN active
+    TIMESTAMP created_at
+    TIMESTAMP updated_at
+  }
+
+  COMPONENTS {
+    UUID component_id PK
+    UUID subsystem_id FK
+    VARCHAR component_name
+    BOOLEAN active
+    TIMESTAMP created_at
+    TIMESTAMP updated_at
+  }
+
+  MACHINE_SYSTEMS {
+    UUID machine_id PK
+    UUID system_id PK
+    TIMESTAMP active_from
+    TIMESTAMP active_to
+    TIMESTAMP created_at
+  }
+
+  RECORDS {
+    UUID record_id PK
+    UUID machine_id FK
+    VARCHAR source_system
+    VARCHAR source_work_order_id
+    TIMESTAMP start_date
+    TIMESTAMP end_date
+    BOOLEAN ongoing
+    TEXT original_text
+    TEXT clean_text
+    VARCHAR preproc_version
+    TIMESTAMP created_at
+    TIMESTAMP updated_at
+  }
+
+  JOBS {
+    UUID job_id PK
+    UUID record_id FK
+    UUID system_id FK
+    UUID subsystem_id FK
+    VARCHAR job_type
+    TIMESTAMP start_date
+    TIMESTAMP end_date
+    BOOLEAN ongoing
+    TEXT notes
+    TIMESTAMP created_at
+    TIMESTAMP updated_at
+  }
+
+  ACTION_TYPES {
+    UUID action_type_id PK
+    VARCHAR action_type_name
+    TEXT description
+    BOOLEAN active
+    TIMESTAMP created_at
+    TIMESTAMP updated_at
+  }
+
+  ACTIONS {
+    UUID action_id PK
+    UUID job_id FK
+    UUID action_type_id FK
+    UUID subsystem_id FK
+    UUID component_id FK
+    TIMESTAMP performed_at
+    TEXT notes
+    TIMESTAMP created_at
+    TIMESTAMP updated_at
+  }
+
 ```
 
 ---
